@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: projectcamp-api
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node src/index.js
+    healthCheckPath: /api/v1/healthcheck
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        sync: false
+      - key: ACCESS_TOKEN_SECRET
+        sync: false
+      - key: REFRESH_TOKEN_SECRET
+        sync: false
+      - key: ACCESS_TOKEN_EXPIRY
+        value: "1d"
+      - key: REFRESH_TOKEN_EXPIRY
+        value: "10d"
+      - key: CORS_ORIGIN
+        sync: false
+      - key: SERVER_URL
+        sync: false
+      - key: FORGOT_PASSWORD_REDIRECT_URL
+        sync: false
+      - key: MAILTRAP_SMTP_HOST
+        value: sandbox.smtp.mailtrap.io
+      - key: MAILTRAP_SMTP_PORT
+        value: "2525"
+      - key: MAILTRAP_SMTP_USER
+        sync: false
+      - key: MAILTRAP_SMTP_PASS
+        sync: false
