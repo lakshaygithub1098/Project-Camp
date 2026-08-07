@@ -2,7 +2,12 @@ import { TaskStatus, UserRole, TaskPriority } from '@/types'
 
 export const APP_NAME = 'ProjectCamp'
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000/api/v1'
+/**
+ * Falls back to the hosted Render API. Set VITE_API_BASE_URL to
+ * http://localhost:8000/api/v1 in client/.env to develop against a local backend.
+ */
+export const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ?? 'https://project-camp-server.onrender.com/api/v1'
 
 /** localStorage keys, namespaced to avoid collisions on shared origins. */
 export const STORAGE_KEYS = {

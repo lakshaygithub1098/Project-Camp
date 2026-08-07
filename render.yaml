@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: projectcamp-api
+    name: project-camp-server
     runtime: node
     plan: free
     buildCommand: npm install
@@ -21,12 +21,14 @@ services:
         value: "1d"
       - key: REFRESH_TOKEN_EXPIRY
         value: "10d"
+      # Public URLs, not secrets — checked in so a fresh deploy self-configures.
+      # Must match the Vercel origin exactly, no trailing slash.
       - key: CORS_ORIGIN
-        sync: false
+        value: https://project-camp-fnza.vercel.app
       - key: SERVER_URL
-        sync: false
+        value: https://project-camp-server.onrender.com
       - key: FORGOT_PASSWORD_REDIRECT_URL
-        sync: false
+        value: https://project-camp-fnza.vercel.app/reset-password
       - key: MAILTRAP_SMTP_HOST
         value: sandbox.smtp.mailtrap.io
       - key: MAILTRAP_SMTP_PORT

@@ -10,7 +10,8 @@ const port = process.env.PORT || 3000;
 connectDB()
   .then(() => {
     app.listen(port, () => {
-      console.log(`Example app listening on port http://localhost:${port}`);
+      const url = process.env.SERVER_URL || `http://localhost:${port}`;
+      console.log(`ProjectCamp API listening on ${url}`);
     });
   })
   .catch((err) => {

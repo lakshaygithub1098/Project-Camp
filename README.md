@@ -1,15 +1,29 @@
-# ProjectCamp — Full-Stack Setup Complete
+# ProjectCamp — Live
 
-Both servers are now running and verified end-to-end.
+A collaborative project management app (simplified Jira/Trello) built with React, TypeScript, Express, and MongoDB.
 
-## What's Running
+## Live Deployment
 
-| Server | URL | Status |
+| Service | URL | Host |
 |---|---|---|
-| **Backend** (Express + MongoDB) | http://localhost:8000 | ✅ Connected to MongoDB Atlas |
-| **Frontend** (React + Vite) | http://localhost:5173 | ✅ Dev server ready |
+| **Frontend** (React + Vite) | https://project-camp-fnza.vercel.app | Vercel |
+| **Backend API** (Express + MongoDB) | https://project-camp-server.onrender.com | Render |
+| **Database** | MongoDB Atlas | Atlas free tier |
 
-Open http://localhost:5173 in your browser to use the app.
+**[Open the app →](https://project-camp-fnza.vercel.app)**
+
+The API is mounted at `/api/v1` — health check: [`/api/v1/healthcheck`](https://project-camp-server.onrender.com/api/v1/healthcheck)
+
+> The Render free tier sleeps after 15 minutes of inactivity. The first request after a sleep takes 30–60 seconds to wake the server; subsequent requests are fast.
+
+## Running Locally
+
+| Server | URL |
+|---|---|
+| Backend | http://localhost:8000 |
+| Frontend | http://localhost:5173 |
+
+Point `client/.env` at `VITE_API_BASE_URL=http://localhost:8000/api/v1` to develop against a local backend instead of the hosted one.
 
 ---
 
@@ -46,17 +60,35 @@ Every API the frontend calls exists and returns the expected shape — tasks, su
 
 ---
 
-## Configuration Files Created
+## Configuration
 
-**`.env`** (backend root, secrets filled — never committed)
+### Production (set in the Render dashboard)
 ```bash
 MONGO_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/projectcamp?retryWrites=true&w=majority
 ACCESS_TOKEN_SECRET=<your-generated-secret>
 REFRESH_TOKEN_SECRET=<your-generated-secret>
+CORS_ORIGIN=https://project-camp-fnza.vercel.app
+SERVER_URL=https://project-camp-server.onrender.com
+FORGOT_PASSWORD_REDIRECT_URL=https://project-camp-fnza.vercel.app/reset-password
 # Mailtrap left blank — mail sends will log failures but not crash
 ```
 
-**`client/.env`** (frontend, already correct)
+`CORS_ORIGIN` must match the Vercel URL exactly, with no trailing slash, or the browser blocks every request.
+
+### Production frontend (set in the Vercel dashboard)
+```bash
+VITE_API_BASE_URL=https://project-camp-server.onrender.com/api/v1
+```
+
+Vercel's **Root Directory** must be set to `client`, since the frontend lives in a subfolder of this repo.
+
+### Local (`.env` at the repo root, `client/.env` for the frontend)
+```bash
+PORT=8000
+CORS_ORIGIN=http://localhost:5173
+SERVER_URL=http://localhost:8000
+FORGOT_PASSWORD_REDIRECT_URL=http://localhost:5173/reset-password
+```
 ```bash
 VITE_API_BASE_URL=http://localhost:8000/api/v1
 ```
@@ -83,15 +115,16 @@ None of these block core usage (auth → projects → tasks → subtasks → mem
 
 ---
 
-## How to Start Fresh
+## Running It Yourself
 
 ```bash
-# Backend
-cd c:/Users/Lakshay\ Pal/Documents/project-management
+# Backend (repo root)
+npm install
 npm start
 
 # Frontend (separate terminal)
 cd client
+npm install
 npm run dev
 ```
 
@@ -100,6 +133,8 @@ Then open http://localhost:5173.
 ---
 
 ## First-Time Usage
+
+Open the [live app](https://project-camp-fnza.vercel.app) (or http://localhost:5173 if running locally).
 
 1. Click **Register** and create an account.
 2. You'll see "verification email sent" — ignore it (no Mailtrap configured).
@@ -113,7 +148,7 @@ The smoke test exercised the full cycle and passed all 14 assertions — the sta
 
 ## Deployment
 
-Backend on Render, frontend on Vercel. Both read config from environment variables, so no code changes are needed between local and production.
+Already deployed — backend on Render, frontend on Vercel. Both read config from environment variables, so no code changes are needed between local and production. The steps below document how it was set up, in case you need to redeploy or fork it.
 
 ### 1. Backend — Render
 
@@ -126,9 +161,9 @@ Backend on Render, frontend on Vercel. Both read config from environment variabl
    | `MONGO_URI` | your Atlas connection string |
    | `ACCESS_TOKEN_SECRET` | fresh 64-byte hex |
    | `REFRESH_TOKEN_SECRET` | a different 64-byte hex |
-   | `CORS_ORIGIN` | your Vercel URL, e.g. `https://project-camp.vercel.app` |
-   | `SERVER_URL` | your Render URL, e.g. `https://projectcamp-api.onrender.com` |
-   | `FORGOT_PASSWORD_REDIRECT_URL` | `https://<vercel-url>/reset-password` |
+   | `CORS_ORIGIN` | `https://project-camp-fnza.vercel.app` |
+   | `SERVER_URL` | `https://project-camp-server.onrender.com` |
+   | `FORGOT_PASSWORD_REDIRECT_URL` | `https://project-camp-fnza.vercel.app/reset-password` |
    | `MAILTRAP_SMTP_USER` / `_PASS` | leave blank unless using Mailtrap |
 
    Generate secrets with:
@@ -136,7 +171,7 @@ Backend on Render, frontend on Vercel. Both read config from environment variabl
    node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
    ```
 4. In **Atlas → Network Access**, add `0.0.0.0/0`. Render's free tier has no static outbound IP, so an IP allowlist will otherwise reject every connection.
-5. Deploy, then verify: `curl https://<your-render-url>/api/v1/healthcheck`
+5. Deploy, then verify: `curl https://project-camp-server.onrender.com/api/v1/healthcheck`
 
 `CORS_ORIGIN` is a chicken-and-egg with step 2 — set it to a placeholder now and correct it once Vercel gives you the real URL.
 
@@ -144,14 +179,14 @@ Backend on Render, frontend on Vercel. Both read config from environment variabl
 
 1. [vercel.com/new](https://vercel.com/new) → import this repo.
 2. Set **Root Directory** to `client`. Vercel then auto-detects Vite (build `npm run build`, output `dist`).
-3. Add one env var: `VITE_API_BASE_URL` = `https://<your-render-url>/api/v1` — the `/api/v1` suffix is required.
+3. Add one env var: `VITE_API_BASE_URL` = `https://project-camp-server.onrender.com/api/v1` — the `/api/v1` suffix is required.
 4. Deploy. [client/vercel.json](client/vercel.json) rewrites all paths to `index.html` so React Router deep links survive a refresh.
 
 Vite inlines `VITE_*` vars at build time, so changing this value requires a redeploy, not just a restart.
 
 ### 3. Close the loop
 
-Go back to Render and set `CORS_ORIGIN` to your real Vercel URL (no trailing slash, include `https://`). Render restarts automatically. Without this the browser blocks every request.
+Go back to Render and set `CORS_ORIGIN` to `https://project-camp-fnza.vercel.app` (no trailing slash). Render restarts automatically. Without this the browser blocks every request.
 
 ### Free-tier caveats
 
